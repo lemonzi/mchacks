@@ -13,8 +13,6 @@ navigator.getUserMedia =
 
 
 function getWAVBlob(opts, callback) {
-    console.log("Getting access to the microphone...");
-    console.log("Got the microphone");
     var source = opts.ctx.createMediaStreamSource(opts.stream);
     var recorder = new Recorder(source);
     recorder.record();
