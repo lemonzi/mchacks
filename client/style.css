@@ -6,18 +6,21 @@ body {
     text-align: center;
 }
 
-button {
-    margin: 20px;
-    font-size: 3em;
+button, a {
+    margin: 10px;
+    font-size: 1.5em;
     padding: 0.6em 1.2em;
     border: 0;
     background: #eeeeee;
     border-radius: 1em;
     outline: none;
     transition: background 300ms linear;
+    font-family: sans-serif;
+    text-decoration: none;
+    color: black;
 }
 
-button:hover {
+button:hover, a:hover {
     background: #dddddd;
 }
 
@@ -27,6 +30,7 @@ button:hover {
 
 .camera-preview {
     margin: 0 auto;
+    margin-bottom: 20px;
     padding-top: 100px;
     width: 100%;
     height: 70%;
