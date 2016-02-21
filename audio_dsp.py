@@ -154,8 +154,8 @@ def process_audio(filename, prefix=None):
     if not prefix: prefix = filename[:-4]
 
     fs, stereo_data = sciwav.read(filename)
-    pre_max = float(abs(stereo_data.max()))
-    stereo_data = np.array(stereo_data / float(abs(stereo_data.max())*1.1), dtype='float32')
+    norm = abs(stereo_data.max()) * 1.1
+    stereo_data = np.array(stereo_data / norm, dtype='float32')
 
     # detect onset of sound action and apply to signal
     onset_pos = detect_onset(stereo_data, fs)
@@ -165,21 +165,18 @@ def process_audio(filename, prefix=None):
     midi_pitch = extract_pitch(sig, fs)
     base_pitch = ceil(midi_pitch)
 
-    tones = range(-2, 2)    # scope of midi pitches
-    upper_limit = fs # one second of data
-    transposed = []
+    tones = range(-2, 2)  # scope of midi pitches
+    upper_limit = fs      # one second of data
 
     for t in tones:
-        scaling_factor = midi2Hz(base_pitch) / midi2Hz(base_pitch-t)
-        new_sig =  speedx(base_sig, scaling_factor)
-        if len(new_sig[:,0]) > upper_limit:
-            new_sig = new_sig[:upper_limit,]
-
+        scaling_factor = midi2Hz(base_pitch+t) / midi2Hz(midi_pitch)
+        new_sig = speedx(sig, scaling_factor)
+        if len(new_sig[:, 0]) > upper_limit:
+            new_sig = new_sig[:upper_limit, ]
         new_sig = fade_in_out(new_sig)
-        transposed.append(np.array(new_sig[:,0] *pre_max, dtype='int32'))
-
-        new_filename = prefix + str(int(base_pitch+t)) + '.wav'
+        new_filename = '{}_{}.wav'.format(prefix, int(base_pitch+t))
         sciwav.write(new_filename, fs, new_sig)
+
 
 if __name__ == '__main__':
     process_audio(sys.argv[1])
