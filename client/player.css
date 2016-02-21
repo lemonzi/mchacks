@@ -33,7 +33,7 @@ body {
     margin: .5em;
     display: inline-block;
     background-color: black;
-    transition: .5s;
+    transition: .05s;
 }
 
 .face.faded {

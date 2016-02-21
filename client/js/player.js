@@ -7,7 +7,7 @@ $(function() {
     masterVolume.connect(ctx.destination);
 
     gridData = {};
-    initGrid(12);
+    initGrid(10);
 
     // This is the map we'll be using for playback
     var buffers = {};
@@ -63,9 +63,11 @@ $(function() {
         playState.events = playState.events.filter(function(ev) {
             return (ev.playTime/1000) >= (timeElapsed + 1);
         });
-        setTimeout(playAsyncStream, 1000);
         if (eventsToPlay.length > 0) {
             playStream(eventsToPlay);
+        }
+        if (playState.events.length > 0) {
+            setTimeout(playAsyncStream, 1000);
         } else {
             setTimeout(function() {
                 location.reload();
@@ -77,7 +79,7 @@ $(function() {
         events.filter(function(ev) { 
             return ev.channel != 10;
         }).forEach(function(ev) {
-            var pitch = ev.param1 - 12;
+            var pitch = ev.param1;
             var time = ev.playTime / 1000;
             console.log("Playing " + pitch + " at time " + time);
             var channel = ev.channel; // just in case... (drumkit?)
