@@ -13,13 +13,13 @@ app.config['data'] = defaultdict(list)
 @app.before_first_request
 def construct_datamodel():
     for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-        if len(filename) > 10 and filename[-4:] == '.wav':
+        if len(filename) > 10 and filename[-4:] == '.mp3':
             filename = filename[:-4] # remove ending
             tmp = filename.split('_')
             sound = tmp[0]
             midi_node = tmp[1]
             epoch_time = tmp[2]
-            audio_name = filename + '.wav'
+            audio_name = filename + '.mp3'
             image_name = sound + '_' + epoch_time + '.jpeg'
             app.config['data'][(sound, midi_node)].append((audio_name, image_name))
 
@@ -37,7 +37,7 @@ def player():
 @app.route('/upload', methods=['POST'])
 def upload():
     req = flask.request
-    if 'audio' not in req.files or 'photo' not in req.values:
+    if 'audio' not in req.files or 'photo' not in req.files:
         return flask.make_response('Error: malformed request', 400)
     id = 'sing'  # make an id
     location = os.path.join(app.config['UPLOAD_FOLDER'], id)
@@ -45,12 +45,10 @@ def upload():
     midi_list, timestamp = audio_dsp.process_audio(audio, sound=location)
     photo_fn = '{}_{}.jpeg'.format(id,timestamp)
     for m in midi_list:
-        audio_fn = '{}_{}_{}.wav'.format(id,m,timestamp)
+        audio_fn = '{}_{}_{}.mp3'.format(id,m,timestamp)
         app.config['data'][(id,str(m))].append((audio_fn, photo_fn))
-    photo = req.values['photo']
-    # photo.save(location+'.jpeg')
-    with open(os.path.join(app.config['UPLOAD_FOLDER'], photo_fn), 'w') as fd:
-        fd.write(base64.b64decode(photo))
+    photo = req.files['photo']
+    photo.save('{}_{}.jpeg'.format(location, timestamp));
     return 'Loaded data'
 
 
@@ -63,6 +61,16 @@ def uploaded_file(sound, pitch):
     if t:
         filename = random.choice(t)
         return flask.send_from_directory(app.config['UPLOAD_FOLDER'], filename[0])
+    else:
+        return flask.make_response('Sample not found', 404)
+
+
+@app.route('/images/<sound>/<pitch>')
+def uploaded_photo(sound, pitch):
+    t = app.config['data'][(sound, str(pitch))]
+    if t:
+        filename = random.choice(t)
+        return flask.send_from_directory(app.config['UPLOAD_FOLDER'], filename[1])
     else:
         return flask.make_response('Sample not found', 404)
 

@@ -6,6 +6,8 @@ $(function() {
     masterVolume.gain.value = 0.5;
     masterVolume.connect(ctx.destination);
 
+    initGrid(6);
+
     // This is the map we'll be using for playback
     var buffers = {};
 
@@ -81,7 +83,7 @@ $(function() {
             } else {
                 console.log('buffer empty...');
             }
-            // images[pitch].show(when);
+            faceForNote(pitch);
         });
     }
 

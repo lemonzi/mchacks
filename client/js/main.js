@@ -7,7 +7,7 @@ $(function() {
     Webcam.set({
         audio: true,
         image_format: 'jpeg',
-        jpeg_quality: 85,
+        jpeg_quality: 70,
         // live preview size
         width: 320,
         height: 240,
@@ -28,27 +28,23 @@ $(function() {
             stream: Webcam.stream
         }, function(audio_blob) {
             console.log("Got the audio", audio_blob);
-            Webcam.snap(function(snap) {
-                // var raw = snap.replace(/^data\:image\/\w+\);base64\,/, '');
-                // var arr = [Webcam.base64DecToArr(raw)];
-                // var photo_blob = new Blob(arr, {type: 'image/jpeg'});
-                // console.log("Got the image", photo_blob);
-                // var img = document.querySelector('#test-img');
-                // img.src = URL.createObjectURL(photo_blob);
-                fd = new FormData();
-                //fd.append('photo', photo_blob);
-                fd.append('photo', snap);
-                fd.append('audio', audio_blob);
-                $.ajax({
-                    url: '/upload',
-                    data: fd,
-                    processData: false,
-                    contentType: false,
-                    type: 'POST',
-                    success: function(data){
-                        // yaaay
-                    }
-                });
+            Webcam.snap(function(snap, canvas) {
+                canvas.toBlob(function(photo_blob) {
+                    console.log("Got the snap", photo_blob);
+                    fd = new FormData();
+                    fd.append('photo', photo_blob);
+                    fd.append('audio', audio_blob);
+                    $.ajax({
+                        url: '/upload',
+                        data: fd,
+                        processData: false,
+                        contentType: false,
+                        type: 'POST',
+                        success: function(data){
+                            // yaaay
+                        }
+                    });
+                }, 'image/jpeg', 0.7);
             });
         });
     });
