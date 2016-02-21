@@ -66,8 +66,6 @@ def uploaded_file(sound, pitch):
 
 @app.route('/images/<sound>/<pitch>')
 def uploaded_photo(sound, pitch):
-    flask.response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    flask.response.headers['Pragma'] = 'no-cache'
     t = app.config['data'][(sound, str(pitch))]
     if t:
         filename = random.choice(t)
