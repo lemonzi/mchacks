@@ -177,7 +177,7 @@ def process_audio(filename, sound=None):
     midi_notes = []
     for t in tones:
         scaling_factor = midi2Hz(base_pitch+t) / midi2Hz(midi_pitch)
-        #new_sig = speedx(sig, scaling_factor)
+        #new_sig = speedx(sig[:,0], scaling_factor)
         new_sig = pv.pitchshift(sig[:,0], scaling_factor)
         if len(new_sig) > upper_limit:
             new_sig = new_sig[:upper_limit]
@@ -188,7 +188,8 @@ def process_audio(filename, sound=None):
         midi_notes.append(midi_note)
 
         new_filename = "{}_{}_{}.wav".format(sound, midi_note, epoch_time)
-        sciwav.write(new_filename, fs, new_sig)
+        new_sig = new_sig * 32768;
+        sciwav.write(new_filename, fs, new_sig.astype(np.int16))
 
     return midi_notes, epoch_time
 
