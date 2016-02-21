@@ -9,6 +9,8 @@ import scipy.io.wavfile as sciwav
 from math import ceil
 import time
 from pv import PhaseVocoder
+import subprocess
+import os
 
 
 def detect_onset(sig, fs):
@@ -144,7 +146,7 @@ def Hz2midi(f):
     return 69 + 12*np.log2(f/440.)
 
 def fade_in_out(new_sig):
-    N = 1024
+    N = 1024*8
     triag = np.ones(len(new_sig))
     triag[:N] = np.arange(N) / N
     #triag[-N:] = np.arange(N, 0, -1) / N
@@ -157,7 +159,7 @@ def process_audio(filename, sound=None):
     if not sound: sound = filename[:-4]
 
     fs, stereo_data = sciwav.read(filename)
-    norm = abs(stereo_data.max()) * 1.2
+    norm = abs(stereo_data.max()) * 1.3
     stereo_data = np.array(stereo_data / norm, dtype='float32')
 
     # detect onset of sound action and apply to signal
@@ -175,6 +177,7 @@ def process_audio(filename, sound=None):
 
     epoch_time = str(int(time.time()))
     midi_notes = []
+    filenames = []
     for t in tones:
         scaling_factor = midi2Hz(base_pitch+t) / midi2Hz(midi_pitch)
         #new_sig = speedx(sig[:,0], scaling_factor)
@@ -188,8 +191,18 @@ def process_audio(filename, sound=None):
         midi_notes.append(midi_note)
 
         new_filename = "{}_{}_{}.wav".format(sound, midi_note, epoch_time)
+        filenames.append(new_filename)
         new_sig = new_sig * 32768;
         sciwav.write(new_filename, fs, new_sig.astype(np.int16))
+
+        # convert to mp3
+        file = new_filename[:-4]
+        
+
+    for f in filenames:
+        cmd = ["ffmpeg", "-loglevel", "panic", "-i", f, f[:-4] + '.mp3']
+        subprocess.call(cmd, shell=False)
+        os.remove(f)
 
     return midi_notes, epoch_time
 
