@@ -18,12 +18,12 @@ def upload():
     if 'audio' not in req.files or 'photo' not in req.values:
         return 'Error: malformed request', 400
     id = 42  # make an id
-    location = os.path.join(app.config['UPLOAD_FOLDER'], str(id)+'.{}')
+    location = os.path.join(app.config['UPLOAD_FOLDER'], str(id))
     audio = req.files['audio']
-    audio_dsp.process_audio(audio, prefix=location.format('wav'))
+    audio_dsp.process_audio(audio, prefix=location)
     photo = req.values['photo']
-    # photo.save(location.format('jpeg'))
-    with open(location.format('jpeg'), 'w') as fd:
+    # photo.save(location+'.jpeg')
+    with open(location+'.jpeg', 'w') as fd:
         fd.write(base64.b64decode(photo))
     return 'Loaded data'
 

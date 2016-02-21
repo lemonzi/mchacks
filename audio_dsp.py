@@ -15,8 +15,6 @@ def detect_onset(sig, fs):
     win_s = 512          # fft size
     hop_s = win_s / 2    # hop size
 
-    # s = source(filename, fs, hop_s)
-    # fs = s.samplerate
     o = onset("hfc", win_s, hop_s, fs)
 
     # list of onsets, in samples
@@ -107,28 +105,28 @@ def stretch(sound_array, f, window_size, h):
     for i in np.arange(0, len(sound_array)-(window_size+h), h*f):
 
         # two potentially overlapping subarrays
-        a1 = sound_array[i: i + window_size]
-        a2 = sound_array[i + h: i + window_size + h]
+        a1 = sound_array[i:i+window_size]
+        a2 = sound_array[i+h:i+window_size+h]
 
         # resynchronize the second array on the first
-        s1 =  np.fft.fft(hanning_window * a1)
-        s2 =  np.fft.fft(hanning_window * a2)
+        s1 = np.fft.fft(hanning_window * a1)
+        s2 = np.fft.fft(hanning_window * a2)
         phase = (phase + np.angle(s2/s1)) % 2*np.pi
         a2_rephased = np.fft.ifft(np.abs(s2)*np.exp(1j*phase))
 
         # add to result
         i2 = int(i/f)
-        result[i2 : i2 + window_size] += hanning_window*a2_rephased
+        result[i2:i2+window_size] += hanning_window * a2_rephased
 
-    result = ((2**(16-4)) * result/result.max()) # normalize (16bit)
+    result = ((2**(16-4)) * result/result.max())  # normalize (16bit)
 
     return result.astype('int16')
 
 
 def pitchshift(snd_array, n, window_size=2**10, h=2**8):
     """ Changes the pitch of a sound by ``n`` semitones. """
-    #factor = 2**(1.0 * n / 12.0)
-    snd_array = snd_array[:,0]    # Use left channel
+    # factor = 2**(1.0 * n / 12.0)
+    snd_array = snd_array[:, 0]    # Use left channel
     factor = n
     stretched = stretch(snd_array, 1.0/factor, window_size, h)
     return speedx(stretched[window_size:], factor)
@@ -149,7 +147,6 @@ def fade_in_out(new_sig):
     triag[-256:] = np.arange(256, 0, -1) / 256.
     new_sig[:,0] = new_sig[:,0] * triag
     new_sig[:,1] = new_sig[:,1] * triag
-
     return new_sig
 
 
@@ -164,19 +161,12 @@ def process_audio(filename, prefix=None):
     onset_pos = detect_onset(stereo_data, fs)
     sig = stereo_data[onset_pos:]
 
+    # Quantize pitch to nearest semitone
     midi_pitch = extract_pitch(sig, fs)
     base_pitch = ceil(midi_pitch)
 
-    scaling_factor = midi2Hz(base_pitch) / midi2Hz(midi_pitch)
-
-    base_sig = speedx(sig, scaling_factor)
-
-    new_filename = prefix + str(int(base_pitch)) + '.wav'
-    sciwav.write(new_filename, fs, base_sig)
-
-    tones = range(-10, 10)    # scope of midi pitches
+    tones = range(-2, 2)    # scope of midi pitches
     upper_limit = fs # one second of data
-
     transposed = []
 
     for t in tones:

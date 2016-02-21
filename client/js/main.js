@@ -1,4 +1,4 @@
-SAMPLE_DURATION = 500;
+SAMPLE_DURATION = 2000;
 
 $(function() {
 
@@ -46,7 +46,7 @@ $(function() {
                     contentType: false,
                     type: 'POST',
                     success: function(data){
-                        alert(data);
+                        // yaaay
                     }
                 });
             });
