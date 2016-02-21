@@ -12,6 +12,7 @@ app.config['data'] = defaultdict(list)
 
 @app.before_first_request
 def construct_datamodel():
+    new_dataset = defaultdict(list)
     for filename in os.listdir(app.config['UPLOAD_FOLDER']):
         if len(filename) > 10 and filename[-4:] == '.mp3':
             filename = filename[:-4] # remove ending
@@ -21,7 +22,8 @@ def construct_datamodel():
             epoch_time = tmp[2]
             audio_name = filename + '.mp3'
             image_name = sound + '_' + epoch_time + '.jpeg'
-            app.config['data'][(sound, midi_node)].append((audio_name, image_name))
+            new_dataset[(sound, midi_node)].append((audio_name, image_name))
+    app.config['data'] = new_dataset
 
 
 @app.route('/')
@@ -49,6 +51,7 @@ def upload():
         app.config['data'][(id,str(m))].append((audio_fn, photo_fn))
     photo = req.files['photo']
     photo.save('{}_{}.jpeg'.format(location, timestamp));
+    construct_datamodel()
     return 'Loaded data'
 
 

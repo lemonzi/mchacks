@@ -31,7 +31,9 @@ $(function() {
 
     //setInterval(function(){reloadBufferRange(20, 95)}, 3000);
 
-    $.getNative('/midi/zankarland.mid', function(data) {
+    var song = location.search || 'turkish';
+    song = song.split('&')[0].replace('?','');
+    $.getNative('/midi/'+song+'.mid', function(data) {
         setTimeout(function() {
             playWrapper(midiStream(data));
         }, 2000);
@@ -70,7 +72,7 @@ $(function() {
         events.filter(function(ev) { 
             return ev.channel != 10;
         }).forEach(function(ev) {
-            var pitch = ev.param1;
+            var pitch = ev.param1 - 12;
             var time = ev.playTime / 1000;
             console.log("Playing " + pitch + " at time " + time);
             var channel = ev.channel; // just in case... (drumkit?)
