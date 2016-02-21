@@ -64,8 +64,13 @@ $(function() {
             return (ev.playTime/1000) >= (timeElapsed + 1);
         });
         setTimeout(playAsyncStream, 1000);
-        if (eventsToPlay.length > 0)
+        if (eventsToPlay.length > 0) {
             playStream(eventsToPlay);
+        } else {
+            setTimeout(function() {
+                location.reload();
+            }, 2000);
+        }
     }
 
     function playStream(events) {
