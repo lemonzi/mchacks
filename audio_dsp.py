@@ -7,6 +7,8 @@ from aubio import onset, pitch
 import numpy as np
 import scipy.io.wavfile as sciwav
 from math import ceil
+import time
+from pv import PhaseVocoder
 
 
 def detect_onset(sig, fs):
@@ -142,19 +144,21 @@ def Hz2midi(f):
     return 69 + 12*np.log2(f/440.)
 
 def fade_in_out(new_sig):
+    N = 1024
     triag = np.ones(len(new_sig))
-    triag[:256] = np.arange(256) / 256.
-    triag[-256:] = np.arange(256, 0, -1) / 256.
-    new_sig[:,0] = new_sig[:,0] * triag
-    new_sig[:,1] = new_sig[:,1] * triag
+    triag[:N] = np.arange(N) / N
+    #triag[-N:] = np.arange(N, 0, -1) / N
+    new_sig = new_sig * triag
+    #new_sig[:,1] = new_sig[:,1] * triag
     return new_sig
 
 
-def process_audio(filename, prefix=None):
-    if not prefix: prefix = filename[:-4]
+def process_audio(filename, sound=None):
+    if not sound: sound = filename[:-4]
 
     fs, stereo_data = sciwav.read(filename)
-    norm = abs(stereo_data.max()) * 1.1
+    sciwav.write("test.wav", fs, stereo_data)
+    norm = abs(stereo_data.max()) * 1.2
     stereo_data = np.array(stereo_data / norm, dtype='float32')
 
     # detect onset of sound action and apply to signal
@@ -165,16 +169,24 @@ def process_audio(filename, prefix=None):
     midi_pitch = extract_pitch(sig, fs)
     base_pitch = ceil(midi_pitch)
 
-    tones = range(-2, 2)  # scope of midi pitches
+    tones = range(-10, 10)  # scope of midi pitches
     upper_limit = fs      # one second of data
+
+    pv = PhaseVocoder()
 
     for t in tones:
         scaling_factor = midi2Hz(base_pitch+t) / midi2Hz(midi_pitch)
-        new_sig = speedx(sig, scaling_factor)
-        if len(new_sig[:, 0]) > upper_limit:
-            new_sig = new_sig[:upper_limit, ]
+        #new_sig = speedx(sig, scaling_factor)
+        new_sig = pv.pitchshift(sig[:,0], scaling_factor)
+        if len(new_sig) > upper_limit:
+            new_sig = new_sig[:upper_limit]
         new_sig = fade_in_out(new_sig)
-        new_filename = '{}_{}.wav'.format(prefix, int(base_pitch+t))
+
+        # filename: {sound}_{midi}_{time since epoch}.wav
+        midi_note  = str(int(base_pitch+t))
+        epoch_time = str(int(time.time()))
+
+        new_filename = "{}_{}_{}.wav".format(sound, midi_note, epoch_time)
         sciwav.write(new_filename, fs, new_sig)
 
 
