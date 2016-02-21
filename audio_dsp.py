@@ -169,11 +169,12 @@ def process_audio(filename, sound=None):
     midi_pitch = extract_pitch(sig, fs)
     base_pitch = ceil(midi_pitch)
 
-    tones = range(-20, 30)  # scope of midi pitches
+    tones = range(-12, 12)  # scope of midi pitches
     upper_limit = fs      # one second of data
 
     pv = PhaseVocoder()
 
+    epoch_time = str(int(time.time()))
     for t in tones:
         scaling_factor = midi2Hz(base_pitch+t) / midi2Hz(midi_pitch)
         #new_sig = speedx(sig, scaling_factor)
@@ -184,7 +185,7 @@ def process_audio(filename, sound=None):
 
         # filename: {sound}_{midi}_{time since epoch}.wav
         midi_note  = str(int(base_pitch+t))
-        epoch_time = str(int(time.time()))
+        
 
         new_filename = "{}_{}_{}.wav".format(sound, midi_note, epoch_time)
         sciwav.write(new_filename, fs, new_sig)

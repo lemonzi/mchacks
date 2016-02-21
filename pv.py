@@ -12,7 +12,7 @@ epsilon = sys.float_info.epsilon
 
 class PhaseVocoder(object):
 	"""docstring for PhaseVocoder"""
-	def __init__(self, N=2**12, M=2**12, Rs=(2**12/8), w=np.hanning(2**12), alpha=1):
+	def __init__(self, N=2**12, M=2**12, Rs=(2**10), w=np.hanning(2**12), alpha=1):
 		super(PhaseVocoder, self).__init__()
 		self.N	    = N		# FFT size
 		self.M 	    = M		# Window size
@@ -95,7 +95,7 @@ class PhaseVocoder(object):
 			x = np.append(np.zeros(Rs), x)
 			#x = np.append(x, np.zeros(Rs))
 
-			y = np.zeros(int((x.size)*alpha*3))	# THIS IS A BRUTAL HACK!
+			y = np.zeros(int((x.size)*3))	# THIS IS A BRUTAL HACK!
 
 		# Pointers and initializations
 		p, pp = 0, 0
