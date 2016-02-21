@@ -12,6 +12,11 @@ def root():
     return app.send_static_file('index.html')
 
 
+@app.route('/player')
+def player():
+    return app.send_static_file('player.html')
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     req = flask.request
@@ -28,8 +33,9 @@ def upload():
     return 'Loaded data'
 
 
-@app.route('/assets/<filename>')
-def uploaded_file(filename):
+@app.route('/samples/<pitch>')
+def uploaded_file(pitch):
+    filename = '42_{}.wav'.format(pitch)
     return flask.send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
