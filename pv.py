@@ -127,27 +127,10 @@ class PhaseVocoder(object):
 			p = int(p+Ra)		# analysis hop
 			pp += Rs			# synthesis hop
 
-			sys.stdout.write ("Percentage finishied: %d %% \r" % int(100.0*p/pend))
-			sys.stdout.flush()
-
-		y = y / wscale
-
-
-		if self.alpha == 1.0:
-			# retrieve input signal perfectly
-			x = np.delete(x, range(N+Rs))
-			x = np.delete(x, range(x.size-(N+Rs), x.size))
-						
-			y = np.delete(y, range(N))
-			y = np.delete(y, range(y.size-(N+2*Rs), y.size))
-		else:
-			# retrieve input signal perfectly
-			x = np.delete(x, range(Rs))
-
-			y = np.delete(y, range(Rs))
-			y = np.delete(y, range(L0, y.size))
-							
-		return y
+			#sys.stdout.write ("Percentage finishied: %d %% \r" % int(100.0*p/pend))
+			#sys.stdout.flush()
+	
+		return y / wscale
 
 def sin_signal(self, fs, T, f0):
 	"""
