@@ -153,10 +153,11 @@ def fade_in_out(new_sig):
     return new_sig
 
 
-def process_audio(filename, prefix=None,):
+def process_audio(filename, prefix=None):
     if not prefix: prefix = filename[:-4]
 
     fs, stereo_data = sciwav.read(filename)
+    pre_max = float(abs(stereo_data.max()))
     stereo_data = np.array(stereo_data / float(abs(stereo_data.max())*1.1), dtype='float32')
 
     # detect onset of sound action and apply to signal
@@ -173,8 +174,10 @@ def process_audio(filename, prefix=None,):
     new_filename = prefix + str(int(base_pitch)) + '.wav'
     sciwav.write(new_filename, fs, base_sig)
 
-    tones = range(-6, 6)    # scope of midi pitches
-    upper_limit = fs * 1.5
+    tones = range(-10, 10)    # scope of midi pitches
+    upper_limit = fs # one second of data
+
+    transposed = []
 
     for t in tones:
         scaling_factor = midi2Hz(base_pitch) / midi2Hz(base_pitch-t)
@@ -183,10 +186,10 @@ def process_audio(filename, prefix=None,):
             new_sig = new_sig[:upper_limit,]
 
         new_sig = fade_in_out(new_sig)
+        transposed.append(np.array(new_sig[:,0] *pre_max, dtype='int32'))
 
         new_filename = prefix + str(int(base_pitch+t)) + '.wav'
         sciwav.write(new_filename, fs, new_sig)
-
 
 if __name__ == '__main__':
     process_audio(sys.argv[1])
