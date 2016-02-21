@@ -24,7 +24,7 @@ class PhaseVocoder(object):
 		"""
 		Read signal from .wav file
 		filename: name of input .wav file
-		returns fs: sampling frequency, x: signal stored in filename .wav file 
+		returns fs: sampling frequency, x: signal stored in filename .wav file
 		"""
 		(fs, x) = wavfile.read(filename)
 		if len(np.shape(x)) > 1:
@@ -122,14 +122,14 @@ class PhaseVocoder(object):
 			Yold = Y
 			Yold[Yold == 0] = epsilon
 
-			y[pp:pp+N] += w*np.fft.ifft(Y)
-			
+			y[pp:pp+N] += np.real(w*np.fft.ifft(Y))
+
 			p = int(p+Ra)		# analysis hop
 			pp += Rs			# synthesis hop
 
 			#sys.stdout.write ("Percentage finishied: %d %% \r" % int(100.0*p/pend))
 			#sys.stdout.flush()
-	
+
 		return y / wscale
 
 def sin_signal(self, fs, T, f0):
@@ -137,7 +137,7 @@ def sin_signal(self, fs, T, f0):
 	Generate a sinusoidal signal
 	fs: sampling frequency, T: signal duration, f0: signal frequency
 	returns: sinusoid of frequency f0 and length T*fs
-	""" 
+	"""
 	t  = np.linspace(0, T, T*fs, endpoint=False)
 	return 2**(16-2)*np.sin(2*np.pi * f0 * t)
 
@@ -146,11 +146,11 @@ def ramp_signal(self, fs, T):
 	Generate a ramp signal
 	fs: sampling frequency, T: signal duration, f0: signal frequency
 	returns: ramp of length T*fs
-	""" 
+	"""
 	return 2**(16-2) * np.linspace(0, T, T*fs, endpoint=False) / (T*fs)
 
 if __name__ == '__main__':
-	
+
 	if len(sys.argv) < 4:
 		print "Usage: py.py <input_file.wav> <timestretch factor> <ouput_file.wav>"
 	else:
@@ -168,7 +168,7 @@ if __name__ == '__main__':
 		w = np.append(w, [0])		# Make window symmetric about (M-1)/2
 
 		# Synthesis hop factor and hop size
-		Os = 4.						# Synthesis hop factor 
+		Os = 4.						# Synthesis hop factor
 		Rs = int(N / Os)			# Synthesis hop size
 
 

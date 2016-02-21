@@ -16,7 +16,7 @@ $(function() {
             toLoad.push(i);
         }
         toLoad.forEach(function(i) {
-            $.getNative('/samples/' + i, function(buffer) {
+            $.getNative('/samples/sing/' + i, function(buffer) {
                 ctx.decodeAudioData(buffer, function(res) {
                     buffers[i] = res;
                 });
@@ -26,7 +26,7 @@ $(function() {
 
     reloadBufferRange(20, 95);
 
-    setInterval(function(){reloadBufferRange(20, 95)}, 2000);
+    //setInterval(function(){reloadBufferRange(20, 95)}, 2000);
 
     $.getNative('/midi/zankarland.mid', function(data) {
         setTimeout(function() {

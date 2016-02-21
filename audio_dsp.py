@@ -157,7 +157,6 @@ def process_audio(filename, sound=None):
     if not sound: sound = filename[:-4]
 
     fs, stereo_data = sciwav.read(filename)
-    sciwav.write("test.wav", fs, stereo_data)
     norm = abs(stereo_data.max()) * 1.2
     stereo_data = np.array(stereo_data / norm, dtype='float32')
 
@@ -175,6 +174,7 @@ def process_audio(filename, sound=None):
     pv = PhaseVocoder()
 
     epoch_time = str(int(time.time()))
+    midi_notes = []
     for t in tones:
         scaling_factor = midi2Hz(base_pitch+t) / midi2Hz(midi_pitch)
         #new_sig = speedx(sig, scaling_factor)
@@ -184,11 +184,13 @@ def process_audio(filename, sound=None):
         new_sig = fade_in_out(new_sig)
 
         # filename: {sound}_{midi}_{time since epoch}.wav
-        midi_note  = str(int(base_pitch+t))
-        
+        midi_note = str(int(base_pitch+t))
+        midi_notes.append(midi_note)
 
         new_filename = "{}_{}_{}.wav".format(sound, midi_note, epoch_time)
         sciwav.write(new_filename, fs, new_sig)
+
+    return midi_notes, epoch_time
 
 
 if __name__ == '__main__':
