@@ -69,7 +69,7 @@ def uploaded_photo(sound, pitch):
     t = app.config['data'][(sound, str(pitch))]
     if t:
         filename = random.choice(t)
-        return flask.send_from_directory(app.config['UPLOAD_FOLDER'], filename[1])
+        return flask.send_from_directory(app.config['UPLOAD_FOLDER'], filename[1], cache_timeout=1)
     else:
         return flask.make_response('Sample not found', 404)
 

@@ -29,7 +29,7 @@ $(function() {
 
     reloadBufferRange(20, 95);
 
-    //setInterval(function(){reloadBufferRange(20, 95)}, 2000);
+    //setInterval(function(){reloadBufferRange(20, 95)}, 3000);
 
     $.getNative('/midi/zankarland.mid', function(data) {
         setTimeout(function() {
