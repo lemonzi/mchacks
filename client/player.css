@@ -1,0 +1,27 @@
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.faces {
+    margin: 0 auto;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    max-width: 960px;
+}
+
+.face {
+    width: 15em;
+    height: 15em;
+    margin: .5em;
+    display: inline-block;
+    background-color: black;
+    transition: .5s;
+}
+
+.face.faded {
+}

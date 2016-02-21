@@ -95,7 +95,7 @@ class PhaseVocoder(object):
 			x = np.append(np.zeros(Rs), x)
 			#x = np.append(x, np.zeros(Rs))
 
-			y = np.zeros(int((x.size)*3))	# THIS IS A BRUTAL HACK!
+			y = np.zeros(int((x.size)*5))	# THIS IS A BRUTAL HACK!
 
 		# Pointers and initializations
 		p, pp = 0, 0

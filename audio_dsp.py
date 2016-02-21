@@ -197,7 +197,7 @@ def process_audio(filename, sound=None):
 
         # convert to mp3
         file = new_filename[:-4]
-        
+
 
     for f in filenames:
         cmd = ["ffmpeg", "-loglevel", "panic", "-i", f, f[:-4] + '.mp3']

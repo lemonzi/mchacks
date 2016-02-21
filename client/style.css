@@ -21,6 +21,10 @@ button:hover {
     background: #dddddd;
 }
 
+.recording {
+    background: salmon!important;
+}
+
 .camera-preview {
     margin: 0 auto;
     padding-top: 100px;

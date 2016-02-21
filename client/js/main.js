@@ -1,4 +1,4 @@
-SAMPLE_DURATION = 3000;
+SAMPLE_DURATION = 2000;
 
 $(function() {
 
@@ -22,6 +22,10 @@ $(function() {
     Webcam.attach('.camera-preview');
 
     $('.record-btn').click(function startRecording() {
+        if ($('.record-btn').hasClass('recording')) {
+            return;
+        }
+        $('.record-btn').addClass('recording');
         getWAVBlob({
             ctx: ctx,
             duration: SAMPLE_DURATION,
@@ -29,6 +33,7 @@ $(function() {
         }, function(audio_blob) {
             console.log("Got the audio", audio_blob);
             Webcam.snap(function(snap, canvas) {
+                $('.record-btn').removeClass('recording');
                 canvas.toBlob(function(photo_blob) {
                     console.log("Got the snap", photo_blob);
                     fd = new FormData();
