@@ -1,4 +1,4 @@
-SAMPLE_DURATION = 2000;
+SAMPLE_DURATION = 500;
 
 $(function() {
 
@@ -7,7 +7,7 @@ $(function() {
     Webcam.set({
         audio: true,
         image_format: 'jpeg',
-        jpeg_quality: 80,
+        jpeg_quality: 85,
         // live preview size
         width: 320,
         height: 240,
@@ -29,12 +29,15 @@ $(function() {
         }, function(audio_blob) {
             console.log("Got the audio", audio_blob);
             Webcam.snap(function(snap) {
-                console.log("Got the image");
-                var raw = snap.replace(/^data\:image\/\w+\);base64\,/, '');
-                var arr = [Webcam.base64DecToArr.call(Webcam, raw)] ;
-                var photo_blob = new Blob(arr, {type: 'image/jpeg'});
+                // var raw = snap.replace(/^data\:image\/\w+\);base64\,/, '');
+                // var arr = [Webcam.base64DecToArr(raw)];
+                // var photo_blob = new Blob(arr, {type: 'image/jpeg'});
+                // console.log("Got the image", photo_blob);
+                // var img = document.querySelector('#test-img');
+                // img.src = URL.createObjectURL(photo_blob);
                 fd = new FormData();
-                fd.append('photo', photo_blob);
+                //fd.append('photo', photo_blob);
+                fd.append('photo', snap);
                 fd.append('audio', audio_blob);
                 $.ajax({
                     url: '/upload',
