@@ -170,7 +170,7 @@ def process_audio(filename, sound=None):
     midi_pitch = extract_pitch(sig, fs)
     base_pitch = ceil(midi_pitch)
 
-    tones = range(-12, 12)  # scope of midi pitches
+    tones = range(-5, 5)  # scope of midi pitches
     upper_limit = fs      # one second of data
 
     pv = PhaseVocoder()
