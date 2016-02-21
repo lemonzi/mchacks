@@ -135,18 +135,29 @@ def pitchshift(snd_array, n, window_size=2**10, h=2**8):
 
 
 def midi2Hz(midi_pitch):
+    """ Convert from MIDI notes to Hz """
     return 2**((midi_pitch-69.)/12.) * 440
 
 
 def Hz2midi(f):
+    """ Convert from Hz to MIDI notes """
     return 69 + 12*np.log2(f/440.)
 
+def fade_in_out(new_sig):
+    triag = np.ones(len(new_sig))
+    triag[:256] = np.arange(256) / 256.
+    triag[-256:] = np.arange(256, 0, -1) / 256.
+    new_sig[:,0] = new_sig[:,0] * triag
+    new_sig[:,1] = new_sig[:,1] * triag
 
-def process_audio(file):
+    return new_sig
+
+
+def process_audio(filename, prefix=None,):
+    if not prefix: prefix = filename[:-4]
+
     fs, stereo_data = sciwav.read(filename)
-    stereo_data = np.array(stereo_data / float(stereo_data.max()), dtype='float32')
-
-    print stereo_data.max(), stereo_data.min()
+    stereo_data = np.array(stereo_data / float(abs(stereo_data.max())*1.1), dtype='float32')
 
     # detect onset of sound action and apply to signal
     onset_pos = detect_onset(stereo_data, fs)
@@ -159,15 +170,21 @@ def process_audio(file):
 
     base_sig = speedx(sig, scaling_factor)
 
-    new_filename = filename[:-4] + str(int(base_pitch)) + '.wav'
+    new_filename = prefix + str(int(base_pitch)) + '.wav'
     sciwav.write(new_filename, fs, base_sig)
 
-    tones = range(-12, 12)    # scope of midi pitches
+    tones = range(-6, 6)    # scope of midi pitches
+    upper_limit = fs * 1.5
 
     for t in tones:
         scaling_factor = midi2Hz(base_pitch) / midi2Hz(base_pitch-t)
         new_sig =  speedx(base_sig, scaling_factor)
-        new_filename = filename[:-4] + str(int(base_pitch+t)) + '.wav'
+        if len(new_sig[:,0]) > upper_limit:
+            new_sig = new_sig[:upper_limit,]
+
+        new_sig = fade_in_out(new_sig)
+
+        new_filename = prefix + str(int(base_pitch+t)) + '.wav'
         sciwav.write(new_filename, fs, new_sig)
 
 
