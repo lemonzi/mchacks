@@ -24,13 +24,13 @@ $(function() {
         });
     }
 
-    reloadBufferRange(20, 80);
+    reloadBufferRange(20, 95);
 
-    setInterval(function(){reloadBufferRange(20,80)}, 5000);
+    setInterval(function(){reloadBufferRange(20, 95)}, 2000);
 
     $.getNative('/midi/zankarland.mid', function(data) {
         setTimeout(function() {
-            playStream(midiStream(data));
+            playWrapper(midiStream(data));
         }, 2000);
     });
 
@@ -52,13 +52,14 @@ $(function() {
     function playAsyncStream() {
         var timeElapsed = ctx.currentTime - playState.timeOrigin;
         var eventsToPlay = playState.events.filter(function(ev) {
-            return ev.playTime < (timeElapsed + 1000);
+            return (ev.playTime/1000) < (timeElapsed + 1);
         });
         playState.events = playState.events.filter(function(ev) {
-            return ev.playTime >= (timeElapsed + 1000);
+            return (ev.playTime/1000) >= (timeElapsed + 1);
         });
         setTimeout(playAsyncStream, 1000);
-        playStream(eventsToPlay);
+        if (eventsToPlay.length > 0)
+            playStream(eventsToPlay);
     }
 
     function playStream(events) {

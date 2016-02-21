@@ -1,4 +1,4 @@
-SAMPLE_DURATION = 2000;
+SAMPLE_DURATION = 3000;
 
 $(function() {
 
