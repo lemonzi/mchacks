@@ -6,7 +6,8 @@ $(function() {
     masterVolume.gain.value = 0.5;
     masterVolume.connect(ctx.destination);
 
-    initGrid(6);
+    gridData = {};
+    initGrid(12);
 
     // This is the map we'll be using for playback
     var buffers = {};
@@ -48,6 +49,7 @@ $(function() {
     function playWrapper(events) {
         playState.events = events;
         playState.timeOrigin = ctx.currentTime + 0.3;
+        playState.faces = [];
         playAsyncStream();
     }
 
@@ -83,36 +85,51 @@ $(function() {
             } else {
                 console.log('buffer empty...');
             }
-            faceForNote(when, pitch);
+            playState.faces.push({time: when, pitch: pitch});
         });
     }
 
-});
+    /*
+     * vizz
+     */
 
-/*
- * vizz
- */
 
-gridData = {};
-
-function initGrid(nElements) {
-    gridData.nElements = nElements;
-    var container = $('.faces');
-    for (var i = 0; i < nElements; i++) {
-        var element = $('<div>');
-        element.addClass('face');
-        element.addClass('idx'+i);
-        container.append(element);
+    function initGrid(nElements) {
+        gridData.nElements = nElements;
+        var container = $('.faces');
+        for (var i = 0; i < nElements; i++) {
+            var element = $('<div>');
+            element.addClass('face');
+            element.addClass('idx'+i);
+            container.append(element);
+        }
     }
-}
 
+    function faceForNote(pitch) {
+        var url = '/images/sing/' + pitch;
+        var id = Math.floor(Math.random() * gridData.nElements);
+        var face = $('.face.idx' + id);
+        face.css('background-image', 'url('+url+')');
+    }
 
-function faceForNote(pitch) {
-    var url = '/images/sing/' + pitch;
-    var id = Math.floor(Math.random() * gridData.nElements);
-    var face = $('.face.idx' + id);
-    face.removeClass('faded');
-    face.css('background-image', 'url('+url+')');
-    face.addClass('faded');
-}
+    requestAnimationFrame(function renderingCallback() {
+        // this is our rendering callback that checks everything
+        try {
+            var now = ctx.currentTime;
+            if (playState.faces) {
+                var newFrames = playState.faces.forEach(function(f) {
+                    if (f.time < now) {
+                        faceForNote(f.pitch);
+                    }
+                });
+                playState.faces = playState.faces.filter(function(f) {
+                    return f.time >= now;
+                })
+            }
+        } finally {
+            requestAnimationFrame(renderingCallback);
+        }
+    });
+
+});
 

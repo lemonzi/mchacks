@@ -56,17 +56,18 @@ def upload():
 def uploaded_file(sound, pitch):
     """ Choose a sound with a given MIDI node.
     Return a tuple of audio- and image filenames """
-
     t = app.config['data'][(sound, str(pitch))]
     if t:
         filename = random.choice(t)
-        return flask.send_from_directory(app.config['UPLOAD_FOLDER'], filename[0])
+        return flask.send_from_directory(app.config['UPLOAD_FOLDER'], filename[0], cache_timeout=1)
     else:
         return flask.make_response('Sample not found', 404)
 
 
 @app.route('/images/<sound>/<pitch>')
 def uploaded_photo(sound, pitch):
+    flask.response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    flask.response.headers['Pragma'] = 'no-cache'
     t = app.config['data'][(sound, str(pitch))]
     if t:
         filename = random.choice(t)
