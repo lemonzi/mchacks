@@ -12,7 +12,7 @@ app.config['data'] = defaultdict(list)
 
 @app.before_first_request
 def construct_datamodel():
-    for filename in os.listdir("data"):
+    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
         if len(filename) > 10 and filename[-4:] == '.wav':
             filename = filename[:-4] # remove ending
             tmp = filename.split('_')
@@ -20,7 +20,7 @@ def construct_datamodel():
             midi_node = tmp[1]
             epoch_time = tmp[2]
             audio_name = filename + '.wav'
-            image_name = sound + epoch_time + '.jpeg'
+            image_name = sound + '_' + epoch_time + '.jpeg'
             app.config['data'][(sound, midi_node)].append((audio_name, image_name))
 
 

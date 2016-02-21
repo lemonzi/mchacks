@@ -7,7 +7,7 @@ $(function() {
     masterVolume.connect(ctx.destination);
 
     // This is the map we'll be using for playback
-    var buffers = [];
+    var buffers = {};
 
     function reloadBufferRange(begin, end) {
         // Pre-fill it with some samples
@@ -19,7 +19,7 @@ $(function() {
             $.getNative('/samples/sing/' + i, function(buffer) {
                 ctx.decodeAudioData(buffer, function(res) {
                     buffers[i] = res;
-                });
+                }, function(e) { console.log('error') });
             });
         });
     }
